@@ -1,4 +1,6 @@
 ﻿using System;
+using CustomTimer.EventArgsClasses;
+#pragma warning disable
 
 namespace CustomTimer
 {
@@ -17,6 +19,9 @@ namespace CustomTimer
     /// </summary>
     public class Timer
     {
+        private string name;
+        private int ticks;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Timer"/> class.
         /// </summary>
@@ -24,10 +29,49 @@ namespace CustomTimer
         /// <param name="ticks">Ticks.</param>
         public Timer(string timerName, int ticks)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(timerName))
+            {
+                throw new ArgumentException(null, nameof(timerName));
+            }
+
+            if (ticks <= 0)
+            {
+                throw new ArgumentException(null, nameof(ticks));
+            }
+
+            this.name = timerName;
+            this.ticks = ticks;
         }
-        
-        // TODO: Add implementation here.
-        // Don't use .NET timers classes implementation.
+
+        /// <summary>
+        /// Event handler for the 'Started' event.
+        /// </summary>
+        public event EventHandler<StartedEventArgs>? Started;
+
+        /// <summary>
+        /// Event handler for the 'Tick' event.
+        /// </summary>
+        public event EventHandler<TickEventArgs>? Tick;
+
+        /// <summary>
+        /// Event handler for the 'Stopped' event.
+        /// </summary>
+        public event EventHandler<StoppedEventArgs>? Stopped;
+
+        /// <summary>
+        /// Runs the timer, firing events as described in the requirements.
+        /// </summary>
+        public void Run()
+        {
+            Started?.Invoke(this, new StartedEventArgs(name, ticks));
+
+            for (int i = ticks; i > 0; i--)
+            {
+                Thread.Sleep(1000); // Emulating a delay of 1 second between ticks
+                Tick?.Invoke(this, new TickEventArgs(name, i));
+            }
+
+            Stopped?.Invoke(this, new StoppedEventArgs(name));
+        }
     }
 }

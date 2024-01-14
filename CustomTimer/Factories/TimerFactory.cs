@@ -1,4 +1,5 @@
 ﻿using System;
+#pragma warning disable
 
 namespace CustomTimer.Factories
 {
@@ -20,7 +21,12 @@ namespace CustomTimer.Factories
         /// <returns>A reference to an object of the <see cref="Timer"/> class.</returns>
         public Timer CreateTimer(string? name, int ticks)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("name cant be null", nameof(name));
+            }
+
+            return new Timer(name, ticks);
         }
     }
 }
